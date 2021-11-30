@@ -1,13 +1,20 @@
 import 'package:akshathi/favorites.dart';
+import 'package:akshathi/model/data_model.dart';
 import 'package:akshathi/music.dart';
-import 'package:akshathi/nowplaying.dart';
+import 'package:akshathi/assetaudio.dart';
 import 'package:akshathi/playlist.dart';
 import 'package:akshathi/settings.dart';
 import 'package:akshathi/songs.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:on_audio_query/on_audio_query.dart';
+import 'package:provider/provider.dart';
+
+import 'main.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -18,31 +25,40 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
 
-  bool isPlaying=false;
-  bool isPaused=false;
+  // bool isPlaying=false;
+  // bool isPaused=false;
 
-  final List<IconData> _icons =[
-    Icons.play_arrow,
-    Icons.pause,
-  ];
+  // final List<IconData> _icons =[
+  //   Icons.play_arrow,
+  //   Icons.pause,
+  // ];
 
-  Widget btnStart(){
-    return IconButton(
-        iconSize: 35,
-        onPressed: (){
-          if(isPlaying==false) {
-            audioPlayer.play();
-            setState(() {
-              isPlaying = true;
-            });
-          }else if(isPlaying==true){
-            audioPlayer.pause();
-            setState(() {
-              isPlaying=false;
-            });
-          }
-        },
-        icon: isPlaying==false?Icon(_icons[0]):Icon(_icons[1]));
+  // Widget btnStart(){
+  //   return IconButton(
+  //       iconSize: 35,
+  //       onPressed: (){
+  //         if(isPlaying==false) {
+  //           audioPlayer.play();
+  //           setState(() {
+  //             isPlaying = true;
+  //           });
+  //         }else if(isPlaying==true){
+  //           audioPlayer.pause();
+  //           setState(() {
+  //             isPlaying=false;
+  //           });
+  //         }
+  //       },
+  //       icon: isPlaying==false?Icon(_icons[0]):Icon(_icons[1]));
+  // }
+
+
+  Box<QuerySongs>? allSongsDbInstance;
+
+  @override
+  void initState(){
+    allSongsDbInstance = Hive.box<QuerySongs>(songDetailListBoxName);
+    super.initState();
   }
 
   @override
@@ -105,62 +121,90 @@ class _HomeState extends State<Home> {
                     const SizedBox(
                       height: 20,
                     ),
-                    GestureDetector(
-                      onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context) =>  Nowplaying()));
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 40.0,right: 40),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Colors.grey,
-                                spreadRadius: 5,
-                                blurRadius: 10,
+                    Consumer<PlayerItems>(
+                      builder: (context,setSongDetails,child) => GestureDetector(
+                        onTap: (){
+                          Navigator.push(context, MaterialPageRoute(builder: (context) =>  Nowplaying()));
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 40.0,right: 40),
+                          child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.grey,
+                                    spreadRadius: 5,
+                                    blurRadius: 10,
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          child: ListTile(
-                            isThreeLine: true,
-                            leading: const Image(image: AssetImage('assets/images/song1.jpg')),
-                            title: const Text("Darshana",style: TextStyle(fontWeight: FontWeight.bold),),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text("Hridayam"),
-                                Row(
-                                  // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children:  [
-
-                                    IconButton(
-                                      onPressed: previous,
-                                      icon: Icon(Icons.skip_previous),
-                                      iconSize: 30.0,
+                              child: ValueListenableBuilder(
+                                valueListenable: allSongsDbInstance!.listenable(),
+                                builder: (context,Box<QuerySongs> songFetcher, _) {
+                                  var allKeys = songFetcher.keys.cast<int>().toString();
+                                  var songData = songFetcher.get(setSongDetails.selectedSongKey??0);
+                                  return ListTile(
+                                    isThreeLine: true,
+                                    leading:  QueryArtworkWidget(
+                                      id: songData!.imageId!,
+                                      type: ArtworkType.AUDIO,
+                                      artworkBorder: BorderRadius.circular(0),
                                     ),
+                                    title:  Text(songData.title!,style: const TextStyle(fontWeight: FontWeight.bold),),
+                                    subtitle: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                         Text(songData.artist!),
+                                        Row(
+                                          // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                          children:  [
 
-                                    btnStart(),
+                                            IconButton(
+                                              onPressed: (){
 
-                                    IconButton(
-                                      onPressed: next,
-                                      icon: Icon(Icons.skip_next),
-                                      iconSize: 30.0,
+                                              },
+                                              icon: Icon(Icons.skip_previous),
+                                              iconSize: 30.0,
+                                            ),
+
+
+                                            IconButton(
+                                              onPressed: (){
+                                                setSongDetails.playOrpause();
+                                              },
+                                              icon: setSongDetails.isIconChanged
+                                                  ? const Icon(
+                                                Icons.pause,
+                                                size: 35,
+                                              )
+                                                  : const Icon(
+                                                Icons.play_arrow,
+                                                size: 35,
+                                              ),
+                                            ),
+
+                                            IconButton(
+                                              onPressed: (){
+
+                                              },
+                                              icon: Icon(Icons.skip_next),
+                                              iconSize: 30.0,
+                                            ),
+
+                                          ],
+                                        )
+                                      ],
                                     ),
-
-                                    // Icon(Icons.fast_rewind),
-                                    // Icon(Icons.pause_outlined,size: 30,),
-                                    // Icon(Icons.fast_forward),
-                                  ],
-                                )
-                              ],
+                                    // trailing: const Icon(Icons.radio),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(24),
+                                    ),
+                                  );
+                                }
+                              ),
                             ),
-                            trailing: const Icon(Icons.radio),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(24),
-                            ),
-                          ),
                         ),
                       ),
                     )
@@ -248,22 +292,22 @@ class _HomeState extends State<Home> {
     );
   }
 
-  void next() {
-    setState(() {
-
-    });
-    audioPlayer.next();
-    controller.nextPage(duration: const Duration(milliseconds: 500));
-  }
-
-  void previous() {
-    setState(() {
-
-    });
-    audioPlayer.previous();
-    controller.previousPage(duration: const Duration(milliseconds: 500));
-
-  }
+  // void next() {
+  //   setState(() {
+  //
+  //   });
+  //   audioPlayer.next();
+  //   controller.nextPage(duration: const Duration(milliseconds: 500));
+  // }
+  //
+  // void previous() {
+  //   setState(() {
+  //
+  //   });
+  //   audioPlayer.previous();
+  //   controller.previousPage(duration: const Duration(milliseconds: 500));
+  //
+  // }
 
   Widget get bottomNavigationBar {
     return ClipRRect(
