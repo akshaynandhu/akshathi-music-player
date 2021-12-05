@@ -1,7 +1,7 @@
 import 'package:akshathi/favorites.dart';
 import 'package:akshathi/model/data_model.dart';
 import 'package:akshathi/music.dart';
-import 'package:akshathi/assetaudio.dart';
+import 'package:akshathi/provider.dart';
 import 'package:akshathi/playlist.dart';
 import 'package:akshathi/settings.dart';
 import 'package:akshathi/songs.dart';
@@ -121,90 +121,95 @@ class _HomeState extends State<Home> {
                     const SizedBox(
                       height: 20,
                     ),
-                    Consumer<PlayerItems>(
-                      builder: (context,setSongDetails,child) => GestureDetector(
-                        onTap: (){
-                          Navigator.push(context, MaterialPageRoute(builder: (context) =>  Nowplaying()));
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 40.0,right: 40),
-                          child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.grey,
-                                    spreadRadius: 5,
-                                    blurRadius: 10,
-                                  ),
-                                ],
-                              ),
-                              child: ValueListenableBuilder(
-                                valueListenable: allSongsDbInstance!.listenable(),
-                                builder: (context,Box<QuerySongs> songFetcher, _) {
-                                  var allKeys = songFetcher.keys.cast<int>().toString();
-                                  var songData = songFetcher.get(setSongDetails.selectedSongKey??0);
-                                  return ListTile(
-                                    isThreeLine: true,
-                                    leading:  QueryArtworkWidget(
-                                      id: songData!.imageId!,
-                                      type: ArtworkType.AUDIO,
-                                      artworkBorder: BorderRadius.circular(0),
+                    Expanded(
+                      flex: 1,
+                      child: Consumer<PlayerItems>(
+                        builder: (context,setSongDetails,child) => GestureDetector(
+                          onTap: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context) =>  Nowplaying()));
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 40.0,right: 40),
+                            child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Colors.grey,
+                                      spreadRadius: 5,
+                                      blurRadius: 10,
                                     ),
-                                    title:  Text(songData.title!,style: const TextStyle(fontWeight: FontWeight.bold),),
-                                    subtitle: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                         Text(songData.artist!),
-                                        Row(
-                                          // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                          children:  [
+                                  ],
+                                ),
+                                child: ValueListenableBuilder(
+                                  valueListenable: allSongsDbInstance!.listenable(),
+                                  builder: (context,Box<QuerySongs> songFetcher, _) {
+                                    var allKeys = songFetcher.keys.cast<int>().toString();
+                                    var songData = songFetcher.get(setSongDetails.selectedSongKey??0);
+                                    return ListTile(
+                                      isThreeLine: true,
+                                      leading:  QueryArtworkWidget(
+                                        id: songData!.imageId??0,
+                                        type: ArtworkType.AUDIO,
+                                        artworkBorder: BorderRadius.circular(0),
+                                      ),
+                                      title:  Text(songData.title!,style: const TextStyle(fontWeight: FontWeight.bold),),
+                                      subtitle: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                           Text(songData.artist!),
+                                          Row(
+                                            // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                            children:  [
 
-                                            IconButton(
-                                              onPressed: (){
-
-                                              },
-                                              icon: Icon(Icons.skip_previous),
-                                              iconSize: 30.0,
-                                            ),
-
-
-                                            IconButton(
-                                              onPressed: (){
-                                                setSongDetails.playOrpause();
-                                              },
-                                              icon: setSongDetails.isIconChanged
-                                                  ? const Icon(
-                                                Icons.pause,
-                                                size: 35,
-                                              )
-                                                  : const Icon(
-                                                Icons.play_arrow,
-                                                size: 35,
+                                              IconButton(
+                                                onPressed: (){
+                                                  setSongDetails.prev();
+                                                },
+                                                icon: Icon(Icons.skip_previous),
+                                                iconSize: 30.0,
                                               ),
-                                            ),
 
-                                            IconButton(
-                                              onPressed: (){
 
-                                              },
-                                              icon: Icon(Icons.skip_next),
-                                              iconSize: 30.0,
-                                            ),
+                                              IconButton(
+                                                onPressed: (){
+                                                  setSongDetails.playOrpause();
+                                                },
+                                                icon: setSongDetails.isIconChanged
+                                                    ? const Icon(
+                                                  Icons.pause,
+                                                  size: 35,
+                                                )
+                                                    : const Icon(
+                                                  Icons.play_arrow,
+                                                  size: 35,
+                                                ),
+                                              ),
 
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                    // trailing: const Icon(Icons.radio),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(24),
-                                    ),
-                                  );
-                                }
+                                              Expanded(
+                                                child: IconButton(
+                                                  onPressed: (){
+                                                    setSongDetails.next();
+                                                  },
+                                                  icon: Icon(Icons.skip_next),
+                                                  iconSize: 30.0,
+                                                ),
+                                              ),
+
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                      trailing: const Icon(Icons.radio),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(24),
+                                      ),
+                                    );
+                                  }
+                                ),
                               ),
-                            ),
+                          ),
                         ),
                       ),
                     )

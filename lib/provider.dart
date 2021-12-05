@@ -17,6 +17,21 @@ class PlayerItems extends ChangeNotifier{
     });
   }
 
+  getFavSongsPaths(List<String> songPathList){
+    songPathList.forEach((element) {
+      final audio = Audio.file(element);
+      favPlaylist.add(audio);
+    });
+  }
+  bool didUserClickedANewPlaylst = false;
+
+  getPlaylistSongsPaths(List<String> songPathList){
+    songPathList.forEach((element) {
+      final audio = Audio.file(element);
+      playlistSongsPlaylist.add(audio);
+    });
+  }
+
   showKeys(){
     selectModeOfPlaylist().forEach((element) {debugPrint(element.path);});
   }
@@ -32,6 +47,12 @@ class PlayerItems extends ChangeNotifier{
   String? currentSongDuration;
   bool isSelectedOrNot = true;
   int? currentSongKey = 0;
+  int alreadyPlayingPlaylistIndex = 0;
+  int test =0;
+  bool isAudioPlayingFromPlaylist = false;
+  bool isFavsAlreadyClicked = false;
+
+
 
 
 
@@ -39,11 +60,18 @@ class PlayerItems extends ChangeNotifier{
 
   final _assetsAudioPlayer = AssetsAudioPlayer();
   List<Audio> allSongsplayList = <Audio>[];
+  List<Audio> favPlaylist = <Audio>[];
+  List<Audio> playlistSongsPlaylist = <Audio>[];
 
   int modeOfPlaylist = 1;
+
   selectModeOfPlaylist() {
     if (modeOfPlaylist == 1) {
       return allSongsplayList;
+    }else if(modeOfPlaylist == 2){
+      return favPlaylist;
+    }else if(modeOfPlaylist == 3){
+      return playlistSongsPlaylist;
     }
   }
 
@@ -107,6 +135,19 @@ class PlayerItems extends ChangeNotifier{
     _assetsAudioPlayer.playOrPause();
   }
 
+  int? loopIcon=0;
+  loopSongs(){
+    _assetsAudioPlayer.toggleLoop();
+    if(_assetsAudioPlayer.currentLoopMode!.index == 1){
+      loopIcon = 1;
+    }else if(_assetsAudioPlayer.currentLoopMode!.index == 2){
+      loopIcon = 2;
+    }else{
+      loopIcon = 3;
+    }
+    notifyListeners();
+  }
+
 //  Slider
 
   var currentPosition ;
@@ -137,17 +178,20 @@ class PlayerItems extends ChangeNotifier{
   }
 
   Widget slider() {
-    return Slider(
-      activeColor: Colors.yellow,
-      inactiveColor: Colors.grey,
-      value: curr!.toDouble(),
-      min: 0.0,
-      max: dur!.inSeconds.toDouble(),
-      onChanged: (double newValue) {
-        changeToSeconds(curr!.toInt());
-        curr = newValue;
-        notifyListeners();
-      },
+    return StreamBuilder(
+      stream: _assetsAudioPlayer.currentPosition,
+      builder: (context,asyncSnapshot)=> Slider(
+        activeColor: Colors.yellow,
+        inactiveColor: Colors.grey,
+        value: currentPosition.inSeconds.toDouble(),
+        min: 0.0,
+        max: dur!.inSeconds.toDouble(),
+        onChanged: (double newValue) {
+          changeToSeconds(curr!.toInt());
+          curr = newValue;
+          notifyListeners();
+        },
+      ),
     );
   }
   void changeToSeconds(int seconds) {

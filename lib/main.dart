@@ -7,9 +7,13 @@ import 'package:on_audio_query/on_audio_query.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
-import 'assetaudio.dart';
+import 'provider.dart';
 
 const String songDetailListBoxName = 'querySongs';
+const String newPlaylistBoxName = 'newPlaylistName';
+const String newPlaylistSongBoxName = 'newPlaylistSongs';
+
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,7 +21,11 @@ void main() async {
   final directory = await getApplicationDocumentsDirectory();
   Hive.init(directory.path);
   Hive.registerAdapter(QuerySongsAdapter());
+  Hive.registerAdapter(NewPlaylistNameAdapter());
+  Hive.registerAdapter(PlaylistSongsAdapter());
   await Hive.openBox<QuerySongs>(songDetailListBoxName);
+  await Hive.openBox<NewPlaylistName>(newPlaylistBoxName);
+  await Hive.openBox<PlaylistSongs>(newPlaylistSongBoxName);
 
   runApp(MyApp());
 }
@@ -79,7 +87,7 @@ class _MyAppState extends State<MyApp> {
             title: element.title,
             artist: element.artist,
             duration: element.duration,
-            uri: element.uri);
+            uri: element.uri,);
         querySongs!.add(model);
       }
     } else {
@@ -129,7 +137,7 @@ class _MyAppState extends State<MyApp> {
     return ChangeNotifierProvider<PlayerItems>(
       create: (_) => PlayerItems(),
       child: MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Music App',
         theme: ThemeData(
           // This is the theme of your application.
           //

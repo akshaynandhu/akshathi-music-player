@@ -1,13 +1,14 @@
 import 'package:akshathi/main.dart';
 import 'package:akshathi/model/data_model.dart';
 import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:provider/provider.dart';
 
-import 'assetaudio.dart';
+import 'provider.dart';
 import 'music.dart';
 
 class Songs extends StatefulWidget {
@@ -20,6 +21,9 @@ class Songs extends StatefulWidget {
 class _SongsState extends State<Songs> {
   final OnAudioQuery audioQuery = OnAudioQuery();
   Box<QuerySongs>? querySongsInstance;
+  Box<NewPlaylistName>? newPlaylistNameInstance;
+  Box<PlaylistSongs>? playlistSongsInstance;
+
   List<String> songsPaths =[];
 
 
@@ -27,6 +31,9 @@ class _SongsState extends State<Songs> {
   @override
   void initState() {
     querySongsInstance = Hive.box<QuerySongs>(songDetailListBoxName);
+    // newPlaylistNameInstance = Hive.box<NewPlaylistName>(newPlaylistBoxName);
+    // playlistSongsInstance = Hive.box<PlaylistSongs>(newPlaylistBoxName);
+
     getAllImagePaths();
     getSongPaths();
     super.initState();
@@ -41,6 +48,7 @@ class _SongsState extends State<Songs> {
   }
 
 
+
   getSongPaths(){
     final pInstance = Provider.of<PlayerItems>(context, listen: false);
     if(pInstance.allSongsplayList.isEmpty){
@@ -50,11 +58,62 @@ class _SongsState extends State<Songs> {
     }
     pInstance.showKeys();
     debugPrint("Songlist Done");
+
   }
+
+  commonText(
+      {text,
+        color = Colors.black,
+        double size = 18,
+        family = "Poppins-Regular",
+        weight = FontWeight.w700,
+        isCenter = false}) {
+    return Text(
+      text.toString(),
+      textAlign: isCenter ? TextAlign.center : TextAlign.left,
+      style: style(weight: weight, size: size, family: family, color: color),
+    );
+  }
+
+  style({color, size, family, weight}) {
+    return TextStyle(
+      color: color,
+      fontSize: size,
+      fontFamily: family,
+      fontWeight: weight,
+    );
+  }
+
   changeModeOfPlay(){
     final pInstance = Provider.of<PlayerItems>(context, listen: false);
     pInstance.getAllSongsPaths(songsPaths);
     pInstance.modeOfPlaylist = 1;
+  }
+
+  showFavouriteSnackBar({required BuildContext context, isFavourite}) {
+    final snack = SnackBar(
+      content: isFavourite!
+          ? commonText(
+          text: "Added to Favourites",
+          color: Colors.white,
+          size: 13,
+          weight: FontWeight.w500,
+          isCenter: true)
+          : commonText(
+          text: "Removed from Favourites",
+          color: Colors.black,
+          size: 13,
+          weight: FontWeight.w500,
+          isCenter: true),
+      duration: const Duration(seconds: 1),
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24),
+      ),
+      backgroundColor: Colors.red,
+      width: 250,
+    );
+    return ScaffoldMessenger.of(context).showSnackBar(snack);
   }
 
   @override
@@ -102,6 +161,7 @@ class _SongsState extends State<Songs> {
 
 
   Widget queriedSongs(){
+    bool addToFavs = false;
     return Expanded(
       child: Consumer<PlayerItems>(
           builder: (_, setSongDetails, child) =>ValueListenableBuilder(
@@ -115,6 +175,9 @@ class _SongsState extends State<Songs> {
                 var songData = songFetcher.get(key);
                 return GestureDetector(
                   onTap: (){
+                    setSongDetails.isAudioPlayingFromPlaylist = false;
+                    setSongDetails.isFavsAlreadyClicked = false;
+
                     // setSongDetails.isAllSongsAlreadyClicked = true;
                     changeModeOfPlay();
                     setSongDetails.selectedSongKey = key;
@@ -127,7 +190,31 @@ class _SongsState extends State<Songs> {
                   child: ListTile(
                     title: Text(songData!.title!,style: TextStyle(color: Colors.white),),
                     subtitle: Text(songData.artist?? "No Artist",style: TextStyle(color: Colors.white),),
-                    trailing: const Icon(Icons.play_arrow,color: Colors.white,),
+                    trailing: IconButton(
+                      onPressed: () {
+                        if (songData.isFavourited == true) {
+                          addToFavs = false;
+                        } else {
+                          addToFavs = true;
+                        }
+                        final model = QuerySongs(
+                            title: songData.title,
+                            artist: songData.artist,
+                            duration: songData.duration,
+                            songPath: songData.songPath,
+                            imageId: songData.imageId,
+                            isAddedtoPlaylist: false,
+                            isFavourited: addToFavs);
+                        songFetcher.putAt(key, model);
+                        debugPrint("Added to Favourites $addToFavs");
+                        showFavouriteSnackBar(
+                            context: context, isFavourite: addToFavs);
+                      },
+                      icon: Icon(CupertinoIcons.heart,
+                          color: songData.isFavourited
+                              ? Colors.red
+                              : Colors.white),
+                    ),
                     leading: QueryArtworkWidget(
                       id: songData.imageId!,
                       type: ArtworkType.AUDIO,
