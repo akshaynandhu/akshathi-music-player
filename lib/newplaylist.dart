@@ -81,7 +81,7 @@ class _NewplaylistState extends State<Newplaylist> {
         automaticallyImplyLeading: false,
         leading: IconButton(
           onPressed: (){
-            Navigator.push(context, MaterialPageRoute(builder: (context)=>Home()));
+            Navigator.pop(context);
           },
           icon: const Icon(Icons.arrow_back_ios_outlined,color: Colors.white,),
         ),

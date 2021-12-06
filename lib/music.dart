@@ -258,7 +258,7 @@ class _NowplayingState extends State<Nowplaying> {
                                         imageId: songData.imageId,
                                         isAddedtoPlaylist: false,
                                         isFavourited: addToFavs);
-                                    // songFetcher.putAt(key, model);
+                                    songFetcher.putAt(setSongDetails.currentSongKey!, model);
                                     debugPrint("Added to Favourites $addToFavs");
                                     showFavouriteSnackBar(
                                         context: context, isFavourite: addToFavs);

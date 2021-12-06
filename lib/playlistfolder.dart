@@ -137,43 +137,47 @@ class _PlaylistSongState extends State<PlaylistSong> {
                         widget.selectedPlaylistKey);
                     return SizedBox(
                       width: 180,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      child: Column(
                         children: [
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              IconButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                icon: const Icon(
-                                  Icons.chevron_left_outlined, size: 27,color: Colors.white),),
-                              commonText(text: songData?.playlistName),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              IconButton(
-                                onPressed: () {
-                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>Newplaylist(playlistName: songData!.playlistName,playlistKey: widget.selectedPlaylistKey,)));
-                                },
-                                icon: const Icon(Icons.add,color: Colors.white),
-                                tooltip: "Add More",
+                              Row(
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    icon: const Icon(
+                                      Icons.chevron_left_outlined, size: 27,color: Colors.white),),
+                                  commonText(text: songData?.playlistName),
+                                ],
                               ),
-                              IconButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  playlistSongInstance!.deleteAll(keys);
-                                  playlistNameFetcher.delete(
-                                      widget.selectedPlaylistKey);
-                                  var providerInstance = Provider.of<PlayerItems>(context,listen: false);
-                                  providerInstance.isSelectedOrNot = true;
-                                },
-                                icon: const Icon(Icons.delete,color: Colors.white,),
-                                tooltip: "Delete Playlist",
+                              Row(
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      Navigator.push(context, MaterialPageRoute(builder: (context)=>Newplaylist(playlistName: songData!.playlistName,playlistKey: widget.selectedPlaylistKey,)));
+                                    },
+                                    icon: const Icon(Icons.add,color: Colors.white),
+                                    tooltip: "Add More",
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                      playlistSongInstance!.deleteAll(keys);
+                                      playlistNameFetcher.delete(
+                                          widget.selectedPlaylistKey);
+                                      var providerInstance = Provider.of<PlayerItems>(context,listen: false);
+                                      providerInstance.isSelectedOrNot = true;
+                                    },
+                                    icon: const Icon(Icons.delete,color: Colors.white,),
+                                    tooltip: "Delete Playlist",
+                                  )
+                                ],
                               )
                             ],
-                          )
+                          ),
                         ],
                       ),
                     );

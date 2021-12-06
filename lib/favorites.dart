@@ -54,8 +54,11 @@ class _FavoritesState extends State<Favorites> {
         children: [
           ListView(
             children: [
+              Container(
+                child: image,
+              ),
               const Text(
-                'Favorites',style: TextStyle(color: Colors.white,fontSize: 40,fontWeight: FontWeight.bold,),textAlign: TextAlign.center,
+                'FAVORITES',style: TextStyle(color: Colors.white,fontSize: 30,fontWeight: FontWeight.bold,),textAlign: TextAlign.center,
               ),
               const SizedBox(
                 height: 20,
@@ -75,7 +78,6 @@ class _FavoritesState extends State<Favorites> {
         valueListenable: userSongDbInstance!.listenable(),
         builder: (context, Box<QuerySongs> songFetcher, _) {
           List<int> keys = songFetcher.keys.cast<int>().where((key) => songFetcher.get(key)!.isFavourited == true).toList();
-
           if (songFetcher.isEmpty) {
             return Column(
               children: const [
@@ -124,7 +126,7 @@ class _FavoritesState extends State<Favorites> {
                       child:
                       Text(
                         songDatas.title.toString(),style: const TextStyle(
-                        color: Colors.white,
+                        color: Colors.redAccent,
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
                       ),
@@ -255,17 +257,17 @@ class _FavoritesState extends State<Favorites> {
   //   );
   // }
   //
-  // Widget get image {
-  //   return const ClipRRect(
-  //       borderRadius: BorderRadius.only(
-  //         bottomRight: Radius.circular(60),
-  //         bottomLeft: Radius.circular(60),
-  //       ),
-  //       child: Image(
-  //         image: AssetImage('assets/images/love.jpg'),
-  //       ),
-  //   );
-  // }
+  Widget get image {
+    return const ClipRRect(
+        borderRadius: BorderRadius.only(
+          bottomRight: Radius.circular(60),
+          bottomLeft: Radius.circular(60),
+        ),
+        child: Image(
+          image: AssetImage('assets/images/love.jpg'),
+        ),
+    );
+  }
   //
   // Widget PopupDialog(BuildContext context) {
   //   return AlertDialog(
