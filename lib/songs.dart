@@ -475,25 +475,25 @@ class _SongsState extends State<Songs> {
                 style: TextStyle(color: Colors.white, fontSize: 30,fontWeight: FontWeight.bold),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.white,
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.white),
-                    borderRadius: BorderRadius.circular(30.0),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.white),
-                    borderRadius: BorderRadius.circular(30.0),
-                  ),
-                  hintText: '\t\t\tsearch',
-                  suffixIcon: const Icon(Icons.search),
-                ),
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.all(8.0),
+            //   child: TextField(
+            //     decoration: InputDecoration(
+            //       filled: true,
+            //       fillColor: Colors.white,
+            //       focusedBorder: OutlineInputBorder(
+            //         borderSide: const BorderSide(color: Colors.white),
+            //         borderRadius: BorderRadius.circular(30.0),
+            //       ),
+            //       enabledBorder: OutlineInputBorder(
+            //         borderSide: const BorderSide(color: Colors.white),
+            //         borderRadius: BorderRadius.circular(30.0),
+            //       ),
+            //       hintText: '\t\t\tsearch',
+            //       suffixIcon: const Icon(Icons.search),
+            //     ),
+            //   ),
+            // ),
             queriedSongs(),
           ],
         ),
@@ -595,6 +595,17 @@ class _SongsState extends State<Songs> {
                     leading: QueryArtworkWidget(
                       id: songData.imageId!,
                       type: ArtworkType.AUDIO,
+                      nullArtworkWidget: ClipRRect(
+                        child: Image.asset('assets/images/songsnew.png',
+                          height: 50,
+                          width: 50,
+                          fit: BoxFit.fill,),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      artworkBorder: BorderRadius.circular(10),
+                      artworkHeight: 50,
+                      artworkWidth: 50,
+                      artworkFit: BoxFit.fill,
                     ),
                   ),
                 );

@@ -162,18 +162,18 @@ class _PlaylistSongState extends State<PlaylistSong> {
                                     icon: const Icon(Icons.add,color: Colors.white),
                                     tooltip: "Add More",
                                   ),
-                                  IconButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                      playlistSongInstance!.deleteAll(keys);
-                                      playlistNameFetcher.delete(
-                                          widget.selectedPlaylistKey);
-                                      var providerInstance = Provider.of<PlayerItems>(context,listen: false);
-                                      providerInstance.isSelectedOrNot = true;
-                                    },
-                                    icon: const Icon(Icons.delete,color: Colors.white,),
-                                    tooltip: "Delete Playlist",
-                                  )
+                                  // IconButton(
+                                  //   onPressed: () {
+                                  //     Navigator.of(context).pop();
+                                  //     playlistSongInstance!.deleteAll(keys);
+                                  //     playlistNameFetcher.delete(
+                                  //         widget.selectedPlaylistKey);
+                                  //     var providerInstance = Provider.of<PlayerItems>(context,listen: false);
+                                  //     providerInstance.isSelectedOrNot = true;
+                                  //   },
+                                  //   icon: const Icon(Icons.delete,color: Colors.white,),
+                                  //   tooltip: "Delete Playlist",
+                                  // )
                                 ],
                               )
                             ],
@@ -232,11 +232,11 @@ class _PlaylistSongState extends State<PlaylistSong> {
                     leading: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: QueryArtworkWidget(
-                          id: songData!.songImageId!,
+                          id: songData!.songImageId??0,
                           type: ArtworkType.AUDIO,
                           nullArtworkWidget: ClipRRect(
                               child: Image.asset(
-                                "assets/images/song1.jpg",
+                                "assets/images/songsnew.jpg",
                                 height: 50,
                                 width: 50,
                                 fit: BoxFit.fill,

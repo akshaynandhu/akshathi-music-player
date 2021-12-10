@@ -1,5 +1,6 @@
 import 'package:akshathi/home.dart';
 import 'package:akshathi/model/data_model.dart';
+import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -17,7 +18,9 @@ const String newPlaylistSongBoxName = 'newPlaylistSongs';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  AssetsAudioPlayer.setupNotificationsOpenAction((notification) {
+    return true;
+  });
   final directory = await getApplicationDocumentsDirectory();
   Hive.init(directory.path);
   Hive.registerAdapter(QuerySongsAdapter());

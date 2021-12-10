@@ -1,4 +1,6 @@
 // import 'dart:html';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'package:assets_audio_player/assets_audio_player.dart';
@@ -36,6 +38,25 @@ class PlayerItems extends ChangeNotifier{
     selectModeOfPlaylist().forEach((element) {debugPrint(element.path);});
   }
 
+  bool  turnNotificationOn = false;
+
+  disableNotification(){
+    _assetsAudioPlayer.showNotification = false;
+  }
+  enableNotification(){
+    _assetsAudioPlayer.showNotification = true;
+  }
+
+  var searchSongName;
+  onSearchChanged(TextEditingController searchQuery){
+    Timer? _debounce;
+    if(_debounce?.isActive??false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500),()
+    {
+      searchSongName = searchQuery.text;
+      notifyListeners();
+    });
+  }
 
 
   // Managing Carousal Here
@@ -51,6 +72,7 @@ class PlayerItems extends ChangeNotifier{
   int test =0;
   bool isAudioPlayingFromPlaylist = false;
   bool isFavsAlreadyClicked = false;
+
 
 
 
@@ -134,6 +156,7 @@ class PlayerItems extends ChangeNotifier{
   playOrpause(){
     _assetsAudioPlayer.playOrPause();
   }
+
 
   int? loopIcon=0;
   loopSongs(){

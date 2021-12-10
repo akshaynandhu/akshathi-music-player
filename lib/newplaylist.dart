@@ -145,7 +145,7 @@ class _NewplaylistState extends State<Newplaylist> {
                           type: ArtworkType.AUDIO,
                           nullArtworkWidget: ClipRRect(
                               child: Image.asset(
-                                "assets/images/defaultImage.png",
+                                "assets/images/songsnew.png",
                                 height: 50,
                                 width: 50,
                                 fit: BoxFit.fill,

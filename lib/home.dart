@@ -3,6 +3,7 @@ import 'package:akshathi/model/data_model.dart';
 import 'package:akshathi/music.dart';
 import 'package:akshathi/provider.dart';
 import 'package:akshathi/playlist.dart';
+import 'package:akshathi/search.dart';
 import 'package:akshathi/settings.dart';
 import 'package:akshathi/songs.dart';
 import 'package:flutter/cupertino.dart';
@@ -150,7 +151,17 @@ class _HomeState extends State<Home> {
                                     leading:  QueryArtworkWidget(
                                       id: songData!.imageId??0,
                                       type: ArtworkType.AUDIO,
-                                      artworkBorder: BorderRadius.circular(0),
+                                      nullArtworkWidget: ClipRRect(
+                                        child: Image.asset('assets/images/songsnew.png',
+                                          height: 50,
+                                          width: 50,
+                                          fit: BoxFit.fill,),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                        artworkBorder: BorderRadius.circular(10),
+                                        artworkHeight: 50,
+                                        artworkWidth: 50,
+                                        artworkFit: BoxFit.fill,
                                     ),
                                     title:  Text(songData.title!,style: const TextStyle(fontWeight: FontWeight.bold),overflow: TextOverflow.ellipsis,),
                                     subtitle: Column(
@@ -337,7 +348,7 @@ class _HomeState extends State<Home> {
               icon: IconButton(
                   onPressed: () {
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => const Songs()));
+                        MaterialPageRoute(builder: (context) => const Search()));
                   },
                   icon: const Icon(Icons.search)),
               label: ''),

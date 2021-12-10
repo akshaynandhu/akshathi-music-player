@@ -1,5 +1,9 @@
+import 'package:akshathi/provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class NavBar extends StatefulWidget {
   const NavBar({Key? key}) : super(key: key);
@@ -10,7 +14,31 @@ class NavBar extends StatefulWidget {
 
 class _NavBarState extends State<NavBar> {
 
-  bool noti = false;
+  late SharedPreferences changeNotificationSettings;
+  bool turnNotificationOn = true;
+
+  @override
+  void initState() {
+    initializeNotificationShared();
+    getSharedPreference();
+    super.initState();
+  }
+
+  initializeNotificationShared() async {
+    changeNotificationSettings = await SharedPreferences.getInstance();
+  }
+
+  Future<void> getSharedPreference() async {
+    var pInstance =
+    Provider.of<PlayerItems>(context, listen: false);
+    final sharedPref = await SharedPreferences.getInstance();
+    turnNotificationOn = sharedPref.getBool('changeNotificationMode') ?? true;
+    turnNotificationOn
+        ? pInstance.disableNotification()
+        : pInstance.enableNotification;
+    pInstance.turnNotificationOn = turnNotificationOn;
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -43,9 +71,7 @@ class _NavBarState extends State<NavBar> {
                       color: Colors.white,
                     ),
                     onTap: () {
-                      /* Navigator.pop(context);
-                      Navigator.of(context).push(new MaterialPageRoute(
-                          builder: (context) => dealerBuilder()));*/
+
                     },
                   ),
                   ListTile(
@@ -59,9 +85,7 @@ class _NavBarState extends State<NavBar> {
                       color: Colors.white,
                     ),
                     onTap: () {
-                      /*Navigator.pop(context);
-                      Navigator.of(context).push(new MaterialPageRoute(
-                          builder: (context) => shufflerBuilder()));*/
+
                     },
                   ),
 
@@ -77,9 +101,7 @@ class _NavBarState extends State<NavBar> {
                       color: Colors.white,
                     ),
                     onTap: () {
-                      /* Navigator.pop(context);
-                      Navigator.of(context).push(new MaterialPageRoute(
-                          builder: (context) => mistakePage()));*/
+
                     },
                   ),
                   ListTile(
@@ -110,14 +132,38 @@ class _NavBarState extends State<NavBar> {
                     ),
                   ),
 
-                  SwitchListTile(
-                    title:
-                    Text('Notification',style: TextStyle(fontSize: 18.0, color: Colors.white),),
-                    onChanged: (bool newValue) => setState(() {
-                       noti = newValue;
-                    }),
-                    value: noti,
 
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                     const  Padding(
+                        padding:  EdgeInsets.symmetric(horizontal: 20.0),
+                        child:  Text("Notification",style: TextStyle(color: Colors.white,fontSize: 18,fontWeight: FontWeight.bold),),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                        child: Transform.scale(
+                          scale: 0.65,
+                          child: CupertinoSwitch(
+                            activeColor: Colors.blue,
+                            value: turnNotificationOn,
+                            onChanged: (value) {
+                              turnNotificationOn = value;
+                              var pInstance =
+                              Provider.of<PlayerItems>(context,
+                                  listen: false);
+                              turnNotificationOn
+                                  ? pInstance.enableNotification()
+                                  : pInstance.disableNotification();
+                              pInstance.turnNotificationOn = turnNotificationOn;
+                              changeNotificationSettings.setBool(
+                                  'changeNotificationMode', turnNotificationOn);
+                              setState(() {});
+                            },
+                          ),
+                        ),
+                      )
+                    ],
                   ),
 
                 ]),
